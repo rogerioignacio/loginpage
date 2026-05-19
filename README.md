@@ -71,3 +71,9 @@ export default defineConfig([
   },
 ])
 ```
+## Installation
+```bash
+echo "VITE_CLERK_PUBLISHABLE_KEY=PUT_YOUR_KEY_HERE" > .env
+npm install
+npm run dev
+
