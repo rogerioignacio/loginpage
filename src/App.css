@@ -182,3 +182,62 @@
     border-right-color: var(--border);
   }
 }
+
+/* Clerk SignIn appearance helpers (login page) */
+.lp-clerk-rootBox {
+  width: 100%;
+}
+
+.lp-clerk-card {
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow:
+    0 25px 50px -12px rgba(0, 0, 0, 0.45);
+  border: 1px solid #e2e8f0;
+}
+
+.lp-clerk-headerTitle {
+  color: #0f172a;
+}
+
+.lp-clerk-headerSubtitle {
+  color: #64748b;
+}
+
+.lp-clerk-socialButton {
+  border: 1px solid #cbd5e1;
+}
+.lp-clerk-socialButton:hover {
+  background: #f8fafc;
+}
+
+.lp-clerk-primaryButton {
+  background: #0B3A75;
+  color: #ffffff;
+}
+.lp-clerk-primaryButton:hover {
+  background: #092f5f;
+}
+
+.lp-clerk-footerLink {
+  color: #0B3A75;
+}
+.lp-clerk-footerLink:hover {
+  color: #092f5f;
+}
+
+/* Clerk UserButton appearance helpers (dashboard) */
+.lp-ub-avatar {
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.25);
+}
+
+.lp-ub-popover {
+  border-radius: 14px;
+  border: 1px solid #1e293b;
+  background: #0a1020;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.55);
+}
+
+.lp-ub-action {
+  border-radius: 10px;
+}
