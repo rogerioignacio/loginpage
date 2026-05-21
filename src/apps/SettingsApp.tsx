@@ -34,7 +34,7 @@ export default function SettingsApp({ settings, onSettingsChange }: SettingsAppP
   }
 
   return (
-    <section style={styles.card}>
+    <section className="lp-card" style={styles.card}>
       <p style={styles.kicker}>Workspace</p>
       <h1 style={styles.title}>Settings</h1>
       <p style={styles.subtitle}>
@@ -45,6 +45,7 @@ export default function SettingsApp({ settings, onSettingsChange }: SettingsAppP
         <label style={styles.label}>
           SchemaConverter API URL
           <input
+            className="lp-input"
             style={styles.input}
             value={form.schemaConverterApiUrl}
             onChange={(event) => updateField("schemaConverterApiUrl", event.target.value)}
@@ -55,6 +56,7 @@ export default function SettingsApp({ settings, onSettingsChange }: SettingsAppP
         <label style={styles.label}>
           discoSheet API URL
           <input
+            className="lp-input"
             style={styles.input}
             value={form.discoSheetApiUrl}
             onChange={(event) => updateField("discoSheetApiUrl", event.target.value)}
@@ -63,8 +65,8 @@ export default function SettingsApp({ settings, onSettingsChange }: SettingsAppP
         </label>
 
         <div style={styles.actions}>
-          <button type="submit" style={styles.primaryButton}>Save Settings</button>
-          <button type="button" style={styles.secondaryButton} onClick={resetSettings}>Reset to .env Defaults</button>
+          <button className="lp-button lp-button-primary" type="submit" style={styles.primaryButton}>Save Settings</button>
+          <button className="lp-button lp-button-secondary" type="button" style={styles.secondaryButton} onClick={resetSettings}>Reset to .env Defaults</button>
         </div>
       </form>
 
@@ -74,15 +76,15 @@ export default function SettingsApp({ settings, onSettingsChange }: SettingsAppP
 }
 
 const styles: Record<string, React.CSSProperties> = {
-  card: { border: "1px solid #1E293B", borderRadius: "18px", background: "#0F172A", padding: "1.5rem", boxShadow: "0 24px 60px rgba(0, 0, 0, 0.22)", maxWidth: "760px" },
-  kicker: { margin: 0, color: "#60A5FA", fontSize: "0.75rem", fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase" },
-  title: { margin: "0.25rem 0 0", color: "#FFFFFF", fontSize: "2.25rem", letterSpacing: "-0.03em" },
-  subtitle: { margin: "0.75rem 0 0", color: "#94A3B8", lineHeight: 1.6 },
+  card: { border: "1px solid #E2E8F0", borderRadius: "16px", background: "#FFFFFF", padding: "1.5rem", boxShadow: "0 16px 40px rgba(15, 23, 42, 0.06)", maxWidth: "760px" },
+  kicker: { margin: 0, color: "#0F8F87", fontSize: "0.72rem", fontWeight: 850, letterSpacing: "0.09em", textTransform: "uppercase" },
+  title: { margin: "0.25rem 0 0", color: "#102A2A", fontSize: "2.15rem", letterSpacing: "-0.035em", fontWeight: 800 },
+  subtitle: { margin: "0.75rem 0 0", color: "#64748B", lineHeight: 1.6 },
   form: { display: "grid", gap: "1rem", marginTop: "1.5rem" },
-  label: { display: "grid", gap: "0.45rem", color: "#CBD5E1", fontSize: "0.88rem", fontWeight: 700 },
-  input: { width: "100%", boxSizing: "border-box", border: "1px solid #334155", borderRadius: "12px", background: "#020617", color: "#F8FAFC", padding: "0.72rem 0.85rem", font: "inherit" },
+  label: { display: "grid", gap: "0.48rem", color: "#334155", fontSize: "0.88rem", fontWeight: 700 },
+  input: { width: "100%", boxSizing: "border-box", border: "1px solid #CBD5E1", borderRadius: "12px", background: "#FFFFFF", color: "#102A2A", padding: "0.78rem 0.9rem", font: "inherit", minHeight: "46px", outline: "none", transition: "border-color 160ms ease, box-shadow 160ms ease" },
   actions: { display: "flex", gap: "0.75rem", justifyContent: "flex-end", flexWrap: "wrap" },
-  primaryButton: { border: "1px solid rgba(96, 165, 250, 0.45)", borderRadius: "12px", background: "#2563EB", color: "#FFFFFF", cursor: "pointer", font: "inherit", fontWeight: 800, padding: "0.72rem 1rem" },
-  secondaryButton: { border: "1px solid #334155", borderRadius: "12px", background: "#1E293B", color: "#E2E8F0", cursor: "pointer", font: "inherit", fontWeight: 800, padding: "0.72rem 1rem" },
-  status: { margin: "1rem 0 0", border: "1px solid rgba(34, 197, 94, 0.2)", borderRadius: "12px", background: "rgba(34, 197, 94, 0.12)", color: "#86EFAC", padding: "0.75rem 0.9rem", fontWeight: 800 },
+  primaryButton: { border: "1px solid #0F8F87", borderRadius: "12px", background: "#0F8F87", color: "#FFFFFF", cursor: "pointer", font: "inherit", fontWeight: 800, padding: "0.76rem 1.05rem", minHeight: "46px" },
+  secondaryButton: { border: "1px solid #CBD5E1", borderRadius: "12px", background: "#F8FAFC", color: "#334155", cursor: "pointer", font: "inherit", fontWeight: 800, padding: "0.76rem 1.05rem", minHeight: "46px" },
+  status: { margin: "1rem 0 0", border: "1px solid #A7F3D0", borderRadius: "12px", background: "#ECFDF5", color: "#047857", padding: "0.75rem 0.9rem", fontWeight: 750 },
 };

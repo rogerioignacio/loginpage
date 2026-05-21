@@ -1,5 +1,7 @@
 import { useUser, useOrganization, UserButton, RedirectToSignIn } from "@clerk/clerk-react";
+import type { ComponentType, CSSProperties } from "react";
 import { useState } from "react";
+import { Blocks, ChartNoAxesColumn, FileText, House, Pencil, Settings, Users } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import SchemaConverterApp from "@schema-converter";
 import { SCHEMA_CONVERTER_PAGES } from "@schema-converter/pages";
@@ -7,7 +9,8 @@ import DiscoSheetApp from "../apps/DiscoSheetApp";
 import SettingsApp from "../apps/SettingsApp";
 import { loadServiceSettings } from "../serviceConfig";
 
-type MenuItem = { label: string; href: string };
+type MenuIcon = ComponentType<{ size?: number; strokeWidth?: number }>;
+type MenuItem = { label: string; href: string; icon?: MenuIcon };
 
 const SCHEMA_CONVERTER_BASE = "/dashboard/schema-converter";
 const DISCOSHEET_BASE = "/dashboard/discosheet";
@@ -20,20 +23,20 @@ const SCHEMA_CONVERTER_MENU: MenuItem[] = SCHEMA_CONVERTER_PAGES.map((page) => (
 
 const ROLE_MENU: Record<string, MenuItem[]> = {
   "org:admin": [
-    { label: "🏠 Home",         href: "/dashboard" },
-    { label: "👥 Manage Users", href: "/dashboard/users" },
-    { label: "📊 Reports",      href: "/dashboard/reports" },
-    { label: "📝 discoSheet",   href: DISCOSHEET_BASE },
-    { label: "⚙️ Settings",     href: "/dashboard/settings" },
+    { label: "Home",         href: "/dashboard", icon: House },
+    { label: "Manage Users", href: "/dashboard/users", icon: Users },
+    { label: "Reports",      href: "/dashboard/reports", icon: ChartNoAxesColumn },
+    { label: "discoSheet",   href: DISCOSHEET_BASE, icon: FileText },
+    { label: "Settings",     href: "/dashboard/settings", icon: Settings },
   ],
   "org:member": [
-    { label: "🏠 Home",         href: "/dashboard" },
-    { label: "✏️ Edit Content", href: "/dashboard/content" },
-    { label: "📊 Reports",      href: "/dashboard/reports" },
+    { label: "Home",         href: "/dashboard", icon: House },
+    { label: "Edit Content", href: "/dashboard/content", icon: Pencil },
+    { label: "Reports",      href: "/dashboard/reports", icon: ChartNoAxesColumn },
   ],
   "org:guest": [
-    { label: "🏠 Home",         href: "/dashboard" },
-    { label: "📊 Reports",      href: "/dashboard/reports" },
+    { label: "Home",         href: "/dashboard", icon: House },
+    { label: "Reports",      href: "/dashboard/reports", icon: ChartNoAxesColumn },
   ],
 };
 
@@ -88,13 +91,14 @@ export default function Dashboard() {
         type="button"
         aria-expanded={isSchemaMenuOpen}
         onClick={() => setIsSchemaMenuOpen((isOpen) => !isOpen)}
+        className="lp-nav-item"
         style={{
           ...styles.navItem,
           ...styles.parentNavItem,
           ...(isSchemaConverterRoute ? styles.activeNavItem : {}),
         }}
       >
-        <span style={styles.parentNavLabel}>🧩 Schema Converter</span>
+        <span style={styles.parentNavLabel}><Blocks size={17} strokeWidth={1.9} /> Schema Converter</span>
         <span aria-hidden="true" style={styles.parentNavToggle}>{isSchemaMenuOpen ? "−" : "+"}</span>
       </button>
       {isSchemaMenuOpen && (
@@ -103,6 +107,7 @@ export default function Dashboard() {
             <Link
               key={item.href}
               to={item.href}
+              className="lp-nav-item"
               style={{
                 ...styles.navItem,
                 ...styles.subNavItem,
@@ -118,23 +123,27 @@ export default function Dashboard() {
   );
 
   return (
-    <div style={styles.layout}>
-      <aside style={styles.sidebar}>
+    <div className="lp-dashboard-layout" style={styles.layout}>
+      <aside className="lp-sidebar" style={styles.sidebar}>
         <div style={styles.brand}>
           rogerioignacio<span style={styles.dot}>.com</span>
         </div>
         <nav style={styles.nav}>
           {menuItems.map((item) => (
             <div key={item.href}>
+              {item.icon && (
               <Link
                 to={item.href}
+                className="lp-nav-item"
                 style={{
                   ...styles.navItem,
                   ...(isActiveRoute(item.href) ? styles.activeNavItem : {}),
                 }}
               >
-                {item.label}
+                <item.icon size={17} strokeWidth={1.9} />
+                <span>{item.label}</span>
               </Link>
+              )}
               {shouldShowSchemaMenuAfter(item) && schemaConverterNav}
             </div>
           ))}
@@ -153,7 +162,7 @@ export default function Dashboard() {
           />
         </div>
       </aside>
-      <main style={styles.main}>
+      <main className="lp-main" style={styles.main}>
         {isSchemaConverterRoute && schemaConverterPage ? (
           <SchemaConverterApp
             embedded
@@ -178,25 +187,25 @@ export default function Dashboard() {
   );
 }
 
-const styles: Record<string, React.CSSProperties> = {
-  layout:        { display:"flex", minHeight:"100svh", background:"#0B1220", color:"#E2E8F0", fontFamily:"system-ui, -apple-system, Segoe UI, Roboto, sans-serif" },
-  sidebar:       { width:"240px", background:"#0A1020", borderRight:"1px solid #1E293B", display:"flex", flexDirection:"column", padding:"1.5rem 1rem", gap:"1rem" },
-  brand:         { fontSize:"1.1rem", color:"#FFFFFF", marginBottom:"1rem", fontWeight:700, letterSpacing:"-0.01em" },
-  dot:           { color:"#60A5FA" },
+const styles: Record<string, CSSProperties> = {
+  layout:        { display:"flex", minHeight:"100svh", background:"#F7FAF9", color:"#102A2A", fontFamily:"Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif" },
+  sidebar:       { width:"264px", background:"rgba(255, 255, 255, 0.9)", borderRight:"1px solid #E2E8F0", display:"flex", flexDirection:"column", padding:"1.35rem 1rem", gap:"1.25rem", boxShadow:"10px 0 30px rgba(15, 23, 42, 0.03)", backdropFilter:"blur(12px)" },
+  brand:         { fontSize:"1.02rem", color:"#102A2A", marginBottom:"0.35rem", fontWeight:800, letterSpacing:"-0.02em" },
+  dot:           { color:"#0F8F87" },
   nav:           { display:"flex", flexDirection:"column", gap:"0.4rem", flex:1 },
-  navItem:       { color:"#CBD5E1", textDecoration:"none", padding:"0.55rem 0.75rem", borderRadius:"10px", fontSize:"0.9rem", border:"1px solid transparent" },
+  navItem:       { color:"#475569", textDecoration:"none", padding:"0.68rem 0.75rem", borderRadius:"12px", fontSize:"0.9rem", border:"1px solid transparent", display:"flex", alignItems:"center", gap:"0.65rem", fontWeight:650, transition:"background 160ms ease, color 160ms ease, border-color 160ms ease" },
   navGroup:      { display:"flex", flexDirection:"column", gap:"0.3rem" },
-  parentNavItem: { marginTop:"0.35rem", fontWeight:700, width:"100%", background:"transparent", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"flex-start", gap:"0.45rem", fontFamily:"inherit", textAlign:"left" },
-  parentNavLabel: { display:"inline-flex", alignItems:"center", gap:"0.45rem" },
+  parentNavItem: { marginTop:"0.35rem", width:"100%", background:"transparent", cursor:"pointer", justifyContent:"flex-start", fontFamily:"inherit", textAlign:"left" },
+  parentNavLabel: { display:"inline-flex", alignItems:"center", gap:"0.65rem" },
   parentNavToggle: { marginLeft:"auto" },
-  subNav:        { display:"flex", flexDirection:"column", gap:"0.25rem", marginLeft:"0.8rem", paddingLeft:"0.65rem", borderLeft:"1px solid rgba(148, 163, 184, 0.22)" },
+  subNav:        { display:"flex", flexDirection:"column", gap:"0.25rem", marginLeft:"0.75rem", paddingLeft:"0.7rem", borderLeft:"1px solid #E2E8F0" },
   subNavItem:    { fontSize:"0.82rem", padding:"0.45rem 0.65rem" },
-  activeNavItem: { background:"rgba(96, 165, 250, 0.14)", color:"#FFFFFF", border:"1px solid rgba(96, 165, 250, 0.28)" },
-  activeSubNavItem: { background:"rgba(96, 165, 250, 0.1)", color:"#FFFFFF", border:"1px solid rgba(96, 165, 250, 0.22)" },
-  sidebarFooter: { display:"flex", alignItems:"center", justifyContent:"space-between", paddingTop:"1rem", borderTop:"1px solid #1E293B" },
-  roleTag:       { background:"rgba(96, 165, 250, 0.12)", color:"#60A5FA", fontSize:"0.75rem", padding:"4px 10px", borderRadius:"999px", textTransform:"uppercase", border:"1px solid rgba(96, 165, 250, 0.25)" },
-  main:          { flex:1, padding:"2.5rem" },
-  heading:       { fontSize:"2rem", marginBottom:"0.5rem", color:"#FFFFFF", letterSpacing:"-0.02em" },
-  subtext:       { color:"#94A3B8" },
-  loading:       { color:"#E2E8F0", padding:"2rem" },
+  activeNavItem: { background:"#E6F7F5", color:"#0F766E", border:"1px solid rgba(13, 148, 136, 0.18)" },
+  activeSubNavItem: { background:"rgba(230, 247, 245, 0.72)", color:"#0F766E", border:"1px solid rgba(13, 148, 136, 0.14)" },
+  sidebarFooter: { display:"flex", alignItems:"center", justifyContent:"space-between", paddingTop:"1rem", borderTop:"1px solid #E2E8F0" },
+  roleTag:       { background:"#E6F7F5", color:"#0F766E", fontSize:"0.72rem", padding:"4px 10px", borderRadius:"999px", textTransform:"uppercase", border:"1px solid rgba(13, 148, 136, 0.18)", fontWeight:800, letterSpacing:"0.06em" },
+  main:          { flex:1, padding:"2.25rem", overflowX:"hidden" },
+  heading:       { fontSize:"2rem", marginBottom:"0.5rem", color:"#102A2A", letterSpacing:"-0.02em" },
+  subtext:       { color:"#64748B" },
+  loading:       { color:"#102A2A", padding:"2rem", background:"#F7FAF9" },
 };

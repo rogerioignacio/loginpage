@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Search } from "lucide-react";
 
 type DiscoSheetEntry = {
   id: string;
@@ -214,7 +215,7 @@ export default function DiscoSheetApp({ apiBaseUrl }: { apiBaseUrl: string }) {
   }
 
   return (
-    <div style={styles.shell}>
+    <div className="lp-disco-shell" style={styles.shell}>
       <header style={styles.header}>
         <div>
           <p style={styles.kicker}>discoSheet</p>
@@ -223,35 +224,38 @@ export default function DiscoSheetApp({ apiBaseUrl }: { apiBaseUrl: string }) {
         </div>
       </header>
 
-      <section style={styles.card}>
+      <section className="lp-card" style={styles.card}>
         <div style={styles.sectionHeader}>
-          <div>
+          <div style={styles.sectionHeadingGroup}>
+            <span style={styles.sectionIcon}><Search size={16} strokeWidth={2.2} /></span>
+            <div>
             <p style={styles.kicker}>Search</p>
             <h2 style={styles.sectionTitle}>Search Discovery Sheet Registries</h2>
+            </div>
           </div>
         </div>
-        <form onSubmit={searchEntries} style={styles.searchGrid}>
+        <form onSubmit={searchEntries} className="lp-search-grid" style={styles.searchGrid}>
           <label style={styles.label}>
             Customer Name
-            <input style={styles.input} value={customerName} onChange={(event) => setCustomerName(event.target.value)} placeholder="Full or partial customer name" />
+            <input className="lp-input" style={styles.input} value={customerName} onChange={(event) => setCustomerName(event.target.value)} placeholder="Full or partial customer name" />
           </label>
           <label style={styles.label}>
             Start Date
-            <input style={styles.input} type="date" value={startDate} onChange={(event) => setStartDate(event.target.value)} />
+            <input className="lp-input" style={styles.input} type="date" value={startDate} onChange={(event) => setStartDate(event.target.value)} />
           </label>
           <label style={styles.label}>
             End Date
-            <input style={styles.input} type="date" value={endDate} onChange={(event) => setEndDate(event.target.value)} />
+            <input className="lp-input" style={styles.input} type="date" value={endDate} onChange={(event) => setEndDate(event.target.value)} />
           </label>
           <div style={styles.actions}>
-            <button type="submit" style={styles.primaryButton}>Search Registries</button>
-            <button type="button" style={styles.secondaryButton} onClick={clearSearch}>Clear Search</button>
+            <button className="lp-button lp-button-primary" type="submit" style={styles.primaryButton}>Search Registries</button>
+            <button className="lp-button lp-button-secondary" type="button" style={styles.secondaryButton} onClick={clearSearch}>Clear Search</button>
           </div>
         </form>
         {searchStatus.message && <p style={{ ...styles.status, ...styles[searchStatus.type] }}>{searchStatus.message}</p>}
         <div style={styles.resultsGrid}>
           {entries.map((entry) => (
-            <article key={entry.id} style={styles.resultCard}>
+            <article key={entry.id} className="lp-result-card" style={styles.resultCard}>
               <h3 style={styles.resultTitle}>{entry.customerName || "Unnamed customer"}</h3>
               <p style={styles.resultMeta}>{entry.initiativeName || "No initiative name"} | {new Date(entry.createdAt).toLocaleString()}</p>
               <dl style={styles.resultDetails}>
@@ -269,14 +273,14 @@ export default function DiscoSheetApp({ apiBaseUrl }: { apiBaseUrl: string }) {
         </div>
       </section>
 
-      <form onSubmit={saveEntry} style={styles.card}>
+      <form onSubmit={saveEntry} className="lp-card" style={styles.card}>
         <div style={styles.sectionHeader}>
           <div>
             <p style={styles.kicker}>Table 1</p>
             <h2 style={styles.sectionTitle}>Project Overview</h2>
           </div>
         </div>
-        <div style={styles.gridTwo}>
+        <div className="lp-grid-two" style={styles.gridTwo}>
           <TextField label="Customer Name" value={form.customerName} onChange={(value) => updateField("customerName", value)} />
           <TextField label="Application | Project | Initiative Name" value={form.initiativeName} onChange={(value) => updateField("initiativeName", value)} />
           <label style={styles.label}>
@@ -299,8 +303,8 @@ export default function DiscoSheetApp({ apiBaseUrl }: { apiBaseUrl: string }) {
             <h2 style={styles.sectionTitle}>Drivers & Timelines</h2>
           </div>
         </div>
-        <div style={styles.gridTwo}>
-          <TextField label="Why do Anything (Value Drivers)?" value={form.valueDrivers} onChange={(value) => updateField("valueDrivers", value)} />
+        <div className="lp-grid-two" style={styles.gridTwo}>
+          <TextArea label="Why do Anything (Value Drivers)?" value={form.valueDrivers} onChange={(value) => updateField("valueDrivers", value)} />
           <TextArea label="Timeline/Deadline/Milestone Date? Why?" value={form.timeline} onChange={(value) => updateField("timeline", value)} />
         </div>
 
@@ -310,7 +314,7 @@ export default function DiscoSheetApp({ apiBaseUrl }: { apiBaseUrl: string }) {
             <h2 style={styles.sectionTitle}>Architecture & State</h2>
           </div>
         </div>
-        <div style={styles.gridTwo}>
+        <div className="lp-grid-two" style={styles.gridTwo}>
           <TextArea label="Current State (people, process, technology)" value={form.currentState} onChange={(value) => updateField("currentState", value)} />
           <TextArea label="Future State" value={form.futureState} onChange={(value) => updateField("futureState", value)} />
           <TextArea label="Required Capabilities (people, process, technology)" value={form.requiredCapabilities} onChange={(value) => updateField("requiredCapabilities", value)} />
@@ -318,12 +322,12 @@ export default function DiscoSheetApp({ apiBaseUrl }: { apiBaseUrl: string }) {
         </div>
 
         <div style={styles.formFooter}>
-          <button type="submit" style={styles.primaryButton}>Save Discovery Sheet</button>
+          <button className="lp-button lp-button-primary" type="submit" style={styles.primaryButton}>Save Discovery Sheet</button>
         </div>
         {saveStatus.message && <p style={{ ...styles.status, ...styles[saveStatus.type] }}>{saveStatus.message}</p>}
       </form>
 
-      <section style={styles.card}>
+      <section className="lp-card" style={styles.card}>
         <div style={styles.sectionHeader}>
           <div>
             <p style={styles.kicker}>Guidelines</p>
@@ -347,7 +351,7 @@ function TextField({ label, value, onChange }: { label: string; value: string; o
   return (
     <label style={styles.label}>
       {label}
-      <input style={styles.input} value={value} onChange={(event) => onChange(event.target.value)} />
+      <input className="lp-input" style={styles.input} value={value} onChange={(event) => onChange(event.target.value)} />
     </label>
   );
 }
@@ -356,7 +360,7 @@ function TextArea({ label, value, onChange }: { label: string; value: string; on
   return (
     <label style={styles.label}>
       {label}
-      <textarea style={{ ...styles.input, ...styles.textarea }} value={value} onChange={(event) => onChange(event.target.value)} />
+      <textarea className="lp-input" style={{ ...styles.input, ...styles.textarea }} value={value} onChange={(event) => onChange(event.target.value)} />
     </label>
   );
 }
@@ -372,39 +376,41 @@ function Detail({ label, value }: { label: string; value: string }) {
 }
 
 const styles: Record<string, React.CSSProperties> = {
-  shell: { display: "grid", gap: "1.25rem" },
+  shell: { display: "grid", gap: "1.35rem", width: "100%", maxWidth: "1180px", margin: "0 auto" },
   header: { display: "flex", justifyContent: "space-between", gap: "1rem", alignItems: "flex-start" },
-  kicker: { margin: 0, color: "#60A5FA", fontSize: "0.75rem", fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase" },
-  title: { margin: "0.25rem 0 0", color: "#FFFFFF", fontSize: "2.25rem", letterSpacing: "-0.03em" },
-  subtitle: { margin: "0.5rem 0 0", color: "#94A3B8" },
-  card: { border: "1px solid #1E293B", borderRadius: "18px", background: "#0F172A", padding: "1.25rem", boxShadow: "0 24px 60px rgba(0, 0, 0, 0.22)" },
-  sectionHeader: { display: "flex", justifyContent: "space-between", gap: "1rem", margin: "0.25rem 0 1rem" },
-  sectionTitle: { margin: "0.15rem 0 0", color: "#F8FAFC", fontSize: "1.35rem", letterSpacing: "-0.02em" },
+  kicker: { margin: 0, color: "#0F8F87", fontSize: "0.72rem", fontWeight: 850, letterSpacing: "0.09em", textTransform: "uppercase" },
+  title: { margin: "0.25rem 0 0", color: "#102A2A", fontSize: "2.15rem", lineHeight: 1.08, letterSpacing: "-0.035em", fontWeight: 800 },
+  subtitle: { margin: "0.55rem 0 0", color: "#64748B", fontSize: "0.98rem", maxWidth: "620px" },
+  card: { border: "1px solid #E2E8F0", borderRadius: "16px", background: "#FFFFFF", padding: "1.35rem", boxShadow: "0 16px 40px rgba(15, 23, 42, 0.06)" },
+  sectionHeader: { display: "flex", justifyContent: "space-between", gap: "1rem", margin: "0.1rem 0 1.15rem" },
+  sectionHeadingGroup: { display: "flex", alignItems: "center", gap: "0.75rem" },
+  sectionIcon: { width: "36px", height: "36px", borderRadius: "12px", background: "#E6F7F5", color: "#0F8F87", display: "inline-flex", alignItems: "center", justifyContent: "center", border: "1px solid rgba(13, 148, 136, 0.16)" },
+  sectionTitle: { margin: "0.15rem 0 0", color: "#102A2A", fontSize: "1.28rem", letterSpacing: "-0.02em", fontWeight: 750 },
   searchGrid: { display: "grid", gridTemplateColumns: "minmax(220px, 2fr) repeat(2, minmax(160px, 1fr))", gap: "0.9rem", alignItems: "end" },
-  gridTwo: { display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: "1rem", marginBottom: "1.5rem" },
-  label: { display: "grid", gap: "0.45rem", color: "#CBD5E1", fontSize: "0.88rem", fontWeight: 700 },
-  input: { width: "100%", boxSizing: "border-box", border: "1px solid #334155", borderRadius: "12px", background: "#020617", color: "#F8FAFC", padding: "0.72rem 0.85rem", font: "inherit" },
+  gridTwo: { display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: "1rem", marginBottom: "1.65rem" },
+  label: { display: "grid", gap: "0.48rem", color: "#334155", fontSize: "0.88rem", fontWeight: 700 },
+  input: { width: "100%", boxSizing: "border-box", border: "1px solid #CBD5E1", borderRadius: "12px", background: "#FFFFFF", color: "#102A2A", padding: "0.78rem 0.9rem", font: "inherit", minHeight: "46px", outline: "none", transition: "border-color 160ms ease, box-shadow 160ms ease, background 160ms ease" },
   textarea: { minHeight: "150px", resize: "vertical" },
   radioGroup: { display: "flex", flexWrap: "wrap", gap: "0.85rem", minHeight: "42px", alignItems: "center" },
-  radioLabel: { display: "inline-flex", alignItems: "center", gap: "0.35rem", color: "#CBD5E1", fontWeight: 600 },
+  radioLabel: { display: "inline-flex", alignItems: "center", gap: "0.35rem", color: "#475569", fontWeight: 650 },
   actions: { display: "flex", gap: "0.75rem", gridColumn: "1 / -1", justifyContent: "flex-end" },
   formFooter: { display: "flex", justifyContent: "flex-end" },
-  primaryButton: { border: "1px solid rgba(96, 165, 250, 0.45)", borderRadius: "12px", background: "#2563EB", color: "#FFFFFF", cursor: "pointer", font: "inherit", fontWeight: 800, padding: "0.72rem 1rem" },
-  secondaryButton: { border: "1px solid #334155", borderRadius: "12px", background: "#1E293B", color: "#E2E8F0", cursor: "pointer", font: "inherit", fontWeight: 800, padding: "0.72rem 1rem" },
-  status: { margin: "1rem 0 0", borderRadius: "12px", padding: "0.75rem 0.9rem", fontWeight: 800 },
+  primaryButton: { border: "1px solid #0F8F87", borderRadius: "12px", background: "#0F8F87", color: "#FFFFFF", cursor: "pointer", font: "inherit", fontWeight: 800, padding: "0.76rem 1.05rem", minHeight: "46px" },
+  secondaryButton: { border: "1px solid #CBD5E1", borderRadius: "12px", background: "#F8FAFC", color: "#334155", cursor: "pointer", font: "inherit", fontWeight: 800, padding: "0.76rem 1.05rem", minHeight: "46px" },
+  status: { margin: "1rem 0 0", borderRadius: "12px", padding: "0.75rem 0.9rem", fontWeight: 750 },
   idle: {},
-  loading: { background: "rgba(250, 204, 21, 0.12)", color: "#FACC15", border: "1px solid rgba(250, 204, 21, 0.2)" },
-  success: { background: "rgba(34, 197, 94, 0.12)", color: "#86EFAC", border: "1px solid rgba(34, 197, 94, 0.2)" },
-  error: { background: "rgba(248, 113, 113, 0.12)", color: "#FCA5A5", border: "1px solid rgba(248, 113, 113, 0.2)" },
+  loading: { background: "#FEF9C3", color: "#854D0E", border: "1px solid #FDE68A" },
+  success: { background: "#ECFDF5", color: "#047857", border: "1px solid #A7F3D0" },
+  error: { background: "#FEF2F2", color: "#B91C1C", border: "1px solid #FECACA" },
   resultsGrid: { display: "grid", gap: "0.9rem", marginTop: "1rem" },
-  resultCard: { border: "1px solid #1E293B", borderRadius: "14px", background: "#020617", padding: "1rem" },
-  resultTitle: { margin: 0, color: "#FFFFFF", fontSize: "1.1rem" },
-  resultMeta: { margin: "0.25rem 0 0", color: "#94A3B8", fontSize: "0.88rem" },
+  resultCard: { border: "1px solid #E2E8F0", borderRadius: "14px", background: "#FBFEFD", padding: "1rem", transition: "background 160ms ease, border-color 160ms ease" },
+  resultTitle: { margin: 0, color: "#102A2A", fontSize: "1.05rem" },
+  resultMeta: { margin: "0.25rem 0 0", color: "#64748B", fontSize: "0.88rem" },
   resultDetails: { display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: "0.85rem", margin: "1rem 0 0" },
-  detailLabel: { color: "#60A5FA", fontSize: "0.72rem", fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.08em" },
-  detailValue: { margin: "0.2rem 0 0", color: "#E2E8F0", whiteSpace: "pre-wrap", overflowWrap: "anywhere" },
+  detailLabel: { color: "#0F8F87", fontSize: "0.72rem", fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.06em" },
+  detailValue: { margin: "0.2rem 0 0", color: "#334155", whiteSpace: "pre-wrap", overflowWrap: "anywhere" },
   accordionList: { display: "grid", gap: "0.55rem" },
-  accordionItem: { border: "1px solid #1E293B", borderRadius: "12px", background: "#020617", overflow: "hidden" },
-  accordionSummary: { color: "#F8FAFC", cursor: "pointer", fontWeight: 800, padding: "0.85rem 1rem" },
-  accordionContent: { borderTop: "1px solid #1E293B", color: "#CBD5E1", lineHeight: 1.65, padding: "1rem", whiteSpace: "pre-wrap" },
+  accordionItem: { border: "1px solid #E2E8F0", borderRadius: "12px", background: "#FFFFFF", overflow: "hidden" },
+  accordionSummary: { color: "#102A2A", cursor: "pointer", fontWeight: 800, padding: "0.85rem 1rem" },
+  accordionContent: { borderTop: "1px solid #E2E8F0", color: "#475569", lineHeight: 1.65, padding: "1rem", whiteSpace: "pre-wrap" },
 };
