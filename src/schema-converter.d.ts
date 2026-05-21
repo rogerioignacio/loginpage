@@ -4,6 +4,7 @@ declare module '@schema-converter' {
   const SchemaConverterApp: ComponentType<{
     embedded?: boolean;
     activePage?: string;
+    apiBaseUrl?: string;
     onPageChange?: (page: string) => void;
   }>;
 

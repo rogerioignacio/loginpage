@@ -3,10 +3,15 @@ import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import SchemaConverterApp from "@schema-converter";
 import { SCHEMA_CONVERTER_PAGES } from "@schema-converter/pages";
+import DiscoSheetApp from "../apps/DiscoSheetApp";
+import SettingsApp from "../apps/SettingsApp";
+import { loadServiceSettings } from "../serviceConfig";
 
 type MenuItem = { label: string; href: string };
 
 const SCHEMA_CONVERTER_BASE = "/dashboard/schema-converter";
+const DISCOSHEET_BASE = "/dashboard/discosheet";
+const SETTINGS_BASE = "/dashboard/settings";
 
 const SCHEMA_CONVERTER_MENU: MenuItem[] = SCHEMA_CONVERTER_PAGES.map((page) => ({
   label: page.label,
@@ -18,6 +23,7 @@ const ROLE_MENU: Record<string, MenuItem[]> = {
     { label: "🏠 Home",         href: "/dashboard" },
     { label: "👥 Manage Users", href: "/dashboard/users" },
     { label: "📊 Reports",      href: "/dashboard/reports" },
+    { label: "📝 discoSheet",   href: DISCOSHEET_BASE },
     { label: "⚙️ Settings",     href: "/dashboard/settings" },
   ],
   "org:member": [
@@ -45,6 +51,7 @@ export default function Dashboard() {
   const [isSchemaMenuOpen, setIsSchemaMenuOpen] = useState(() =>
     location.pathname.startsWith(SCHEMA_CONVERTER_BASE)
   );
+  const [serviceSettings, setServiceSettings] = useState(loadServiceSettings);
 
   if (!userLoaded || !orgLoaded) return <div style={styles.loading}>Loading...</div>;
   if (!isSignedIn) return <RedirectToSignIn />;
@@ -53,6 +60,8 @@ export default function Dashboard() {
   const menuItems = ROLE_MENU[role] ?? ROLE_MENU["org:guest"];
   const roleLabel = ROLE_LABEL[role] ?? role;
   const isSchemaConverterRoute = location.pathname.startsWith(SCHEMA_CONVERTER_BASE);
+  const isDiscoSheetRoute = location.pathname.startsWith(DISCOSHEET_BASE);
+  const isSettingsRoute = location.pathname.startsWith(SETTINGS_BASE);
   const schemaConverterPath = location.pathname.replace(`${SCHEMA_CONVERTER_BASE}/`, "");
   const schemaConverterPage =
     SCHEMA_CONVERTER_PAGES.find((page) => page.path === schemaConverterPath) ??
@@ -149,8 +158,13 @@ export default function Dashboard() {
           <SchemaConverterApp
             embedded
             activePage={schemaConverterPage.id}
+            apiBaseUrl={serviceSettings.schemaConverterApiUrl}
             onPageChange={handleSchemaConverterPageChange}
           />
+        ) : isDiscoSheetRoute && role === "org:admin" ? (
+          <DiscoSheetApp apiBaseUrl={serviceSettings.discoSheetApiUrl} />
+        ) : isSettingsRoute && role === "org:admin" ? (
+          <SettingsApp settings={serviceSettings} onSettingsChange={setServiceSettings} />
         ) : (
           <>
             <h1 style={styles.heading}>

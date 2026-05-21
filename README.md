@@ -76,4 +76,16 @@ export default defineConfig([
 echo "VITE_CLERK_PUBLISHABLE_KEY=PUT_YOUR_KEY_HERE" > .env
 npm install
 npm run dev
+```
 
+## Service Configuration
+
+Attached service URLs are configured in `.env`.
+
+```bash
+VITE_SCHEMA_CONVERTER_API_URL=http://localhost:4000
+VITE_DISCOSHEET_API_URL=http://localhost:4000
+```
+
+- `VITE_SCHEMA_CONVERTER_API_URL` is passed to the embedded SchemaConverter app for API calls.
+- `VITE_DISCOSHEET_API_URL` is passed to the embedded discoSheet app for API calls.
