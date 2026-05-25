@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search } from "lucide-react";
+import { Pencil, Search } from "lucide-react";
 
 type DiscoSheetEntry = {
   id: string;
@@ -149,6 +149,9 @@ export default function DiscoSheetApp({ apiBaseUrl }: { apiBaseUrl: string }) {
   const [endDate, setEndDate] = useState("");
   const [searchStatus, setSearchStatus] = useState<Status>({ type: "idle", message: "" });
   const [entries, setEntries] = useState<DiscoSheetEntry[]>([]);
+  const [editingEntryId, setEditingEntryId] = useState<string | null>(null);
+  const [editedEntry, setEditedEntry] = useState<DiscoSheetForm>(initialForm);
+  const [editStatus, setEditStatus] = useState<Status>({ type: "idle", message: "" });
 
   function updateField(field: keyof DiscoSheetForm, value: string) {
     setForm((currentForm) => ({ ...currentForm, [field]: value }));
@@ -196,6 +199,8 @@ export default function DiscoSheetApp({ apiBaseUrl }: { apiBaseUrl: string }) {
       }
 
       setEntries(data.entries);
+      setEditingEntryId(null);
+      setEditStatus({ type: "idle", message: "" });
       setSearchStatus({
         type: "success",
         message: data.entries.length === 1 ? "1 registry found." : `${data.entries.length} registries found.`,
@@ -211,7 +216,48 @@ export default function DiscoSheetApp({ apiBaseUrl }: { apiBaseUrl: string }) {
     setStartDate("");
     setEndDate("");
     setEntries([]);
+    setEditingEntryId(null);
+    setEditStatus({ type: "idle", message: "" });
     setSearchStatus({ type: "idle", message: "" });
+  }
+
+  function startEditingEntry(entry: DiscoSheetEntry) {
+    setEditingEntryId(entry.id);
+    setEditedEntry(toEditableEntry(entry));
+    setEditStatus({ type: "idle", message: "" });
+  }
+
+  function updateEditedEntry(field: keyof DiscoSheetForm, value: string) {
+    setEditedEntry((currentEntry) => ({ ...currentEntry, [field]: value }));
+  }
+
+  function cancelEditingEntry() {
+    setEditingEntryId(null);
+    setEditedEntry(initialForm);
+    setEditStatus({ type: "idle", message: "" });
+  }
+
+  async function saveEntryChanges(entryId: string) {
+    setEditStatus({ type: "loading", message: "Saving changes..." });
+
+    try {
+      const response = await fetch(`${apiBaseUrl}/api/entries/${entryId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editedEntry),
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Unable to save changes");
+      }
+
+      setEntries((currentEntries) => currentEntries.map((entry) => (entry.id === entryId ? data : entry)));
+      setEditingEntryId(null);
+      setEditStatus({ type: "success", message: "Registry changes saved." });
+    } catch (error) {
+      setEditStatus({ type: "error", message: error instanceof Error ? error.message : "Unable to save changes" });
+    }
   }
 
   return (
@@ -253,23 +299,75 @@ export default function DiscoSheetApp({ apiBaseUrl }: { apiBaseUrl: string }) {
           </div>
         </form>
         {searchStatus.message && <p style={{ ...styles.status, ...styles[searchStatus.type] }}>{searchStatus.message}</p>}
+        {editStatus.message && <p style={{ ...styles.status, ...styles[editStatus.type] }}>{editStatus.message}</p>}
         <div style={styles.resultsGrid}>
-          {entries.map((entry) => (
-            <article key={entry.id} className="lp-result-card" style={styles.resultCard}>
-              <h3 style={styles.resultTitle}>{entry.customerName || "Unnamed customer"}</h3>
-              <p style={styles.resultMeta}>{entry.initiativeName || "No initiative name"} | {new Date(entry.createdAt).toLocaleString()}</p>
-              <dl style={styles.resultDetails}>
-                <Detail label="Sales Motion" value={entry.salesMotion} />
-                <Detail label="Contact / Role" value={entry.contactRole} />
-                <Detail label="Value Drivers" value={entry.valueDrivers} />
-                <Detail label="Timeline" value={entry.timeline} />
-                <Detail label="Current State" value={entry.currentState} />
-                <Detail label="Future State" value={entry.futureState} />
-                <Detail label="Required Capabilities" value={entry.requiredCapabilities} />
-                <Detail label="Other Key Information" value={entry.otherKeyInformation} />
-              </dl>
-            </article>
-          ))}
+          {entries.map((entry) => {
+            const isEditing = editingEntryId === entry.id;
+
+            return (
+              <article key={entry.id} className="lp-result-card" style={styles.resultCard}>
+                <div style={styles.resultHeader}>
+                  <div>
+                    <h3 style={styles.resultTitle}>{entry.customerName || "Unnamed customer"}</h3>
+                    <p style={styles.resultMeta}>{entry.initiativeName || "No initiative name"} | {new Date(entry.createdAt).toLocaleString()}</p>
+                  </div>
+                  <button
+                    type="button"
+                    className="lp-icon-button"
+                    style={styles.iconButton}
+                    onClick={() => startEditingEntry(entry)}
+                    aria-label={`Edit ${entry.customerName || "registry"}`}
+                  >
+                    <Pencil size={16} strokeWidth={2.1} />
+                  </button>
+                </div>
+
+                {isEditing ? (
+                  <div className="lp-edit-grid" style={styles.editGrid}>
+                    <TextField label="Customer Name" value={editedEntry.customerName} onChange={(value) => updateEditedEntry("customerName", value)} />
+                    <TextField label="Application | Project | Initiative Name" value={editedEntry.initiativeName} onChange={(value) => updateEditedEntry("initiativeName", value)} />
+                    <label style={styles.label}>
+                      Circle Sales Motion
+                      <div style={styles.radioGroup}>
+                        {salesMotionOptions.map((option) => (
+                          <label key={option} style={styles.radioLabel}>
+                            <input type="radio" name={`salesMotion-${entry.id}`} value={option} checked={editedEntry.salesMotion === option} onChange={(event) => updateEditedEntry("salesMotion", event.target.value)} />
+                            {option[0].toUpperCase() + option.slice(1)}
+                          </label>
+                        ))}
+                      </div>
+                    </label>
+                    <TextField label="Name of person we're meeting with & role" value={editedEntry.contactRole} onChange={(value) => updateEditedEntry("contactRole", value)} />
+                    <TextArea label="Why do Anything (Value Drivers)?" value={editedEntry.valueDrivers} onChange={(value) => updateEditedEntry("valueDrivers", value)} />
+                    <TextArea label="Timeline/Deadline/Milestone Date? Why?" value={editedEntry.timeline} onChange={(value) => updateEditedEntry("timeline", value)} />
+                    <TextArea label="Current State (people, process, technology)" value={editedEntry.currentState} onChange={(value) => updateEditedEntry("currentState", value)} />
+                    <TextArea label="Future State" value={editedEntry.futureState} onChange={(value) => updateEditedEntry("futureState", value)} />
+                    <TextArea label="Required Capabilities (people, process, technology)" value={editedEntry.requiredCapabilities} onChange={(value) => updateEditedEntry("requiredCapabilities", value)} />
+                    <TextArea label="Other Key Information (people, timelines, competing priorities, etc.)" value={editedEntry.otherKeyInformation} onChange={(value) => updateEditedEntry("otherKeyInformation", value)} />
+                    <div style={styles.editActions}>
+                      <button className="lp-button lp-button-secondary" type="button" style={styles.secondaryButton} onClick={cancelEditingEntry}>
+                        Cancel
+                      </button>
+                      <button className="lp-button lp-button-primary" type="button" style={styles.primaryButton} onClick={() => saveEntryChanges(entry.id)}>
+                        Save Changes
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <dl style={styles.resultDetails}>
+                    <Detail label="Sales Motion" value={entry.salesMotion} />
+                    <Detail label="Contact / Role" value={entry.contactRole} />
+                    <Detail label="Value Drivers" value={entry.valueDrivers} />
+                    <Detail label="Timeline" value={entry.timeline} />
+                    <Detail label="Current State" value={entry.currentState} />
+                    <Detail label="Future State" value={entry.futureState} />
+                    <Detail label="Required Capabilities" value={entry.requiredCapabilities} />
+                    <Detail label="Other Key Information" value={entry.otherKeyInformation} />
+                  </dl>
+                )}
+              </article>
+            );
+          })}
         </div>
       </section>
 
@@ -375,6 +473,21 @@ function Detail({ label, value }: { label: string; value: string }) {
   );
 }
 
+function toEditableEntry(entry: DiscoSheetEntry): DiscoSheetForm {
+  return {
+    customerName: entry.customerName || "",
+    initiativeName: entry.initiativeName || "",
+    salesMotion: entry.salesMotion || "",
+    contactRole: entry.contactRole || "",
+    valueDrivers: entry.valueDrivers || "",
+    timeline: entry.timeline || "",
+    currentState: entry.currentState || "",
+    futureState: entry.futureState || "",
+    requiredCapabilities: entry.requiredCapabilities || "",
+    otherKeyInformation: entry.otherKeyInformation || "",
+  };
+}
+
 const styles: Record<string, React.CSSProperties> = {
   shell: { display: "grid", gap: "1.35rem", width: "100%", maxWidth: "1180px", margin: "0 auto" },
   header: { display: "flex", justifyContent: "space-between", gap: "1rem", alignItems: "flex-start" },
@@ -404,9 +517,13 @@ const styles: Record<string, React.CSSProperties> = {
   error: { background: "#FEF2F2", color: "#B91C1C", border: "1px solid #FECACA" },
   resultsGrid: { display: "grid", gap: "0.9rem", marginTop: "1rem" },
   resultCard: { border: "1px solid #E2E8F0", borderRadius: "14px", background: "#FBFEFD", padding: "1rem", transition: "background 160ms ease, border-color 160ms ease" },
+  resultHeader: { display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "1rem" },
+  iconButton: { width: "38px", height: "38px", border: "1px solid #CBD5E1", borderRadius: "12px", background: "#FFFFFF", color: "#0F8F87", cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "background 160ms ease, border-color 160ms ease, transform 160ms ease" },
   resultTitle: { margin: 0, color: "#102A2A", fontSize: "1.05rem" },
   resultMeta: { margin: "0.25rem 0 0", color: "#64748B", fontSize: "0.88rem" },
   resultDetails: { display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: "0.85rem", margin: "1rem 0 0" },
+  editGrid: { display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: "1rem", marginTop: "1rem" },
+  editActions: { display: "flex", justifyContent: "flex-end", gap: "0.75rem", gridColumn: "1 / -1" },
   detailLabel: { color: "#0F8F87", fontSize: "0.72rem", fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.06em" },
   detailValue: { margin: "0.2rem 0 0", color: "#334155", whiteSpace: "pre-wrap", overflowWrap: "anywhere" },
   accordionList: { display: "grid", gap: "0.55rem" },
